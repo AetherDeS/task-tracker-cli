@@ -19,73 +19,50 @@
 
 
 # Работать будет необходимо с библиотекой 'arpgarse'
-import argparse
-import os.path
+from argparse import ArgumentParser
 
 file = 'todo_list.json'
 
-# Читает список дел, если его нет --> создаёт.
-def todo_list_read():
-    if os.path.exists(file) == False:
-        todo_list_create()
 
-    with open(file, 'r') as f:
-        data = f.read()
-    if len(data) <= 1:
-        data = '< -- Todo list is clear -- >'
-    return data
+def todo_list_add(letter):
+    with open(file, 'a', encoding='utf-8') as f:
+        f.write(f'{letter}\n')
 
-#
-def todo_list_create():
-    with open(file, 'w') as f:
-        f.write('')
-
-def todo_list_task_add(task):
-    with open(file, 'w') as f:
-        f.write(task)
-
-def todo_list_task_remove():
-    pass
-
-def todo_list_task_edit():
-    pass
-
-def done_tasks_show():
-    pass
-
-def in_process_tasks_show():
-    pass
-
-def task_count_calculate():
-    with open('todo_list.json', 'r') as f:
-        data = f.readlines()
-        return data
-
+def todo_list_show():
+    try:
+        with open(file, 'r') as f:
+            data = f.readlines()
+            count = len(data)
+            print(f'Tasks in your list: {count}')
+            for i, t in enumerate(data):
+                print(f'{i+1}. {t}')
+    except FileNotFoundError:
+        with open(file, 'w') as f:
+            f.write('')
+        print('File load success. Repeat command.')
+        
 
 def main():
-# Создаём парсер аргументов
-    parser = argparse.ArgumentParser(
-        prog='TASK-TRACKER-CLI',
-        description='Эта программа позволяет вам формировать свой список дел. Все ваши дела хранятся в JSON-файле.',
-        epilog='Если вы хотите отобразить список дел, просто запустите программу')
+    parser = ArgumentParser(prog='TASK-TRACKER', description='This program allow you track your tasks', epilog='--help')
+    
 
-# Перед тем как создавать аргументы стоит помнить что '-h' и '--help' созданы уже за вас по умолчанию
-    #parser.add_argument('--todo_list', type=str, help='Отображает список дел')
-    parser.add_argument('-action', type=str, choices=['add', 'edit', 'remove'], help='Обязательный параметр, принимает действие, которое необходимо осуществить с JSON файлом.')
-    parser.add_argument('task', metavar='sentence', type=str, nargs='+', help='Task')
-    parser.add_argument('-status', type=str, choices=['inp', 'done'], help='Позволяет отмечать задачи как выполняющиеся, или завершенные')
-    # parser.add_argument()
-
+    parser.add_argument('-a', '--action', action='store')
+#     parser.add_argument('task', nargs='+', help='Your sentence for action')
     args = parser.parse_args()
 
-    if args.action == 'inp':
-        in_process_tasks_show()
+    if args.action == 'show':
+         todo_list_show()
     elif args.action == 'add':
-        todo_list_task_add(args.task)
-    else:
-       print(todo_list_read())
+#        try:
+        todo_list_add(input())
+#        except TypeError:
+#        print(' < -- Error! -- > \nYou need write task. \nExample: python main.py add \" some task \"')
 
-print(task_count_calculate())
+#    if args.action == '1':
+#        print('2')
+#    if args.action == '2':
+#        print('3')
+
 
 if __name__ == '__main__':
     main()
